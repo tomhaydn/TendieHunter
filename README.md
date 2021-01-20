@@ -53,7 +53,7 @@ The information you receive from this package should not be taken as financial a
 --minRequiredMentions 
 ```
 - integer (>=1&&<=10)
-- 3
+- 1
 - The minimum required mentions on a given day to be plotted
 
 ## Examples
@@ -63,3 +63,8 @@ python TendieHunter.py --backDate 50 --minRequiredMentions 1 --limitPerDay 500
 ```
 
 ![Example 1](https://polarhcms.com/api/v1/media/object/478/1611107734651_Screenshot%202021-01-20%20125523.png)
+
+## Changelog
+
+v1.0.1
+

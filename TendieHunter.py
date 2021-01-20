@@ -27,7 +27,7 @@ def TendieHunter():
     parser.add_argument('--sub', help='The subreddit to target', default="ASX_Bets")
     parser.add_argument('--limitPerDay', help='The limit of submissions to process per day', default=250)
     parser.add_argument('--backDate', help='The amount of days back from today to process', default=30)
-    parser.add_argument('--minRequiredMentions', help='The minimum required mentions on a given day to be plotted', default=3)
+    parser.add_argument('--minRequiredMentions', help='The minimum required mentions on a given day to be plotted', default=1)
 
     args = parser.parse_args()
 
