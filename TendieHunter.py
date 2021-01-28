@@ -12,6 +12,11 @@ from psaw import PushshiftAPI
 from datetime import datetime, timedelta
 import time
 import argparse
+import importlib
+import urllib.request
+
+get_tickers = importlib.import_module("get_tickers")
+gt = get_tickers
 
 subIndex = {
     "ASX_Bets": "http://www.asx.com.au/asx/research/ASXListedCompanies.csv",
@@ -50,8 +55,8 @@ def TendieHunter():
     if SUBREDDIT not in validSubreddits:
         error(SUBREDDIT + " is not a valid input value for --sub, please refer to the documentation for valid inputs")
 
-    if LIMITPERDAY < 1 or LIMITPERDAY > 500:
-        error("--limitPerDay must be a value between 1 and 500")
+    if LIMITPERDAY < 1 or LIMITPERDAY > 1000:
+        error("--limitPerDay must be a value between 1 and 1000")
 
     if BACKDATE < 1 or BACKDATE > 180:
         error("--backDate must be a value between 1 and 180")
@@ -68,24 +73,46 @@ def TendieHunter():
 
     # Import relevent ticker data ________________________________________________ #
 
-    print("Requesting all current ASX ticker symbols...")
+    print("Requesting all current ticker symbols...")
 
-    validTickers = []
     tickerStops = ["ASX"]
-    outOfRangeCount = 0
-    with requests.Session() as s:
-        download = s.get(CSV_URL)
-        decoded_content = download.content.decode('utf-8')
-        cr = csv.reader(decoded_content.splitlines(), delimiter=',')
-        my_list = list(cr)
-        for row in my_list:
-            try:
-                if row[1] not in tickerStops:
-                    validTickers.append(row[1])
-            except:
-                outOfRangeCount += 1
+    validTickers = []
+    stopCount = 0
 
-    print("Successfully retreived " + str(len(validTickers)) + " tickers")
+    if SUBREDDIT == "wallstreetbets":
+        tickers = gt.get_tickers(NYSE=True, NASDAQ=True, AMEX=True)
+        if len(tickers) == 0:
+            print("Could not get tickers for US markets right now, reverting to pre-loaded data")
+            with open('tickers_us.csv', newline='') as us_tickers:
+                reader = csv.reader(us_tickers, delimiter=',')
+                for row in reader:
+                    ticker = row[0]
+                    try:
+                        if ticker not in tickerStops: validTickers.append(ticker)
+                    except:
+                        stopCount += 1
+        else:
+            for ticker in tickers:
+                try:
+                    if ticker not in tickerStops: validTickers.append(ticker)
+                except:
+                    stopCount += 1
+
+    elif SUBREDDIT == "ASX_Bets":
+
+        response = urllib.request.urlopen(CSV_URL)
+        print(response)
+        lines = [l.decode('utf-8') for l in response.readlines()]
+        reader = csv.reader(lines, delimiter=',')
+        for row in reader:
+            try:
+                ticker = row[1]
+                if ticker not in tickerStops:
+                    validTickers.append(ticker)
+            except:
+                stopCount += 1
+
+    print("Successfully retrieved " + str(len(validTickers)) + " tickers")
 
     # Iterate last x days ______________________________________________________ #
 

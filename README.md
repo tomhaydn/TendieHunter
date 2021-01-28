@@ -66,5 +66,11 @@ python TendieHunter.py --backDate 50 --minRequiredMentions 1 --limitPerDay 500
 
 ## Changelog
 
-v1.0.1
+v1.1.0 - 28/01/2021
+- Add support for wallstreetbets
+- add fallback csv for US tickers
+- refactor request method and processing for AU tickers
+- Increase limit on limitPerDay from 500 > 1000
 
+v1.0.1
+- Changed default minrequiredmentions to 1
